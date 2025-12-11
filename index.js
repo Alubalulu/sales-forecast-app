@@ -3,7 +3,8 @@ const express = require('express');
 const { Pool } = require('pg');
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
-const cookieSession = require('cookie-session');
+const session = require('express-session'); // ADD THIS
+const pgSession = require('connect-pg-simple')(session); // ADD THIS (requires the session object)
 const cors = require('cors');
 const { Parser } = require('json2csv');
 const path = require('path');
@@ -19,9 +20,15 @@ const pool = new Pool({
 
 // --- Middleware ---
 app.use(express.json());
-app.use(cookieSession({
-  maxAge: 24 * 60 * 60 * 1000,
-  keys: [process.env.COOKIE_KEY || 'secret_key']
+app.use(session({
+  store: new pgSession({
+    pool: pool, // Use the existing PostgreSQL connection pool
+    tableName: 'session' // Optional: default table name
+  }),
+  secret: process.env.COOKIE_KEY,
+  resave: false, // Prevents session from being saved on every request
+  saveUninitialized: false, // Prevents creating a session until something is stored
+  cookie: { maxAge: 30 * 24 * 60 * 60 * 1000, secure: true, sameSite: 'none' } // 30 days
 }));
 app.use(passport.initialize());
 app.use(passport.session());
