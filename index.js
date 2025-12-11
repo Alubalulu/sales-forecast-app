@@ -117,7 +117,13 @@ app.post('/api/admin/whitelist', async (req, res) => {
 });
 
 // Catch-all: After checking all API routes, serve the React app's index.html
-app.get('*', (req, res) => {
+// Alternative Catch-all using a specific, named regex group
+app.use((req, res, next) => {
+    // Check if the request is for an API route
+    if (req.path.startsWith('/api/') || req.path.startsWith('/auth/')) {
+        return next();
+    }
+    // If not an API route, serve the static HTML file
     res.sendFile(path.resolve(__dirname, 'client', 'dist', 'index.html'));
 });
 
