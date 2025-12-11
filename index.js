@@ -116,9 +116,9 @@ app.post('/api/admin/whitelist', async (req, res) => {
     res.send({ success: true });
 });
 
-// Catch-all for React Routing: Use a named parameter with a star (e.g., /:path*)
-app.get('/:path*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'client/dist/index.html'));
+// Catch-all: After checking all API routes, serve the React app's index.html
+app.get('*', (req, res) => {
+    res.sendFile(path.resolve(__dirname, 'client', 'dist', 'index.html'));
 });
 
 const PORT = process.env.PORT || 5000;
