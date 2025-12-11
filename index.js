@@ -20,15 +20,22 @@ const pool = new Pool({
 
 // --- Middleware ---
 app.use(express.json());
+app.set('trust proxy', 1);
 app.use(session({
   store: new pgSession({
-    pool: pool, // Use the existing PostgreSQL connection pool
-    tableName: 'session' // Optional: default table name
+    pool: pool,
+    tableName: 'session'
   }),
   secret: process.env.COOKIE_KEY,
-  resave: false, // Prevents session from being saved on every request
-  saveUninitialized: false, // Prevents creating a session until something is stored
-  cookie: { maxAge: 30 * 24 * 60 * 60 * 1000, secure: true, sameSite: 'none' } // 30 days
+  resave: false,
+  saveUninitialized: false,
+  cookie: { 
+    maxAge: 30 * 24 * 60 * 60 * 1000,
+    
+    // 💥 CRITICAL FIXES FOR RENDER/HTTPS DEPLOYMENT 💥
+    secure: true,      // Must be TRUE because Render uses HTTPS
+    sameSite: 'none'   // Necessary for cross-site login (Google -> Render)
+  } 
 }));
 app.use(passport.initialize());
 app.use(passport.session());
