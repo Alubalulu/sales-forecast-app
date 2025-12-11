@@ -116,9 +116,8 @@ app.post('/api/admin/whitelist', async (req, res) => {
     res.send({ success: true });
 });
 
-// Catch-all for React Routing
-// Use '/*' or '/:path*' instead of '*' for broader compatibility
-app.get('/*', (req, res) => {
+// Catch-all for React Routing: Use a named parameter with a star (e.g., /:path*)
+app.get('/:path*', (req, res) => {
   res.sendFile(path.join(__dirname, 'client/dist/index.html'));
 });
 
